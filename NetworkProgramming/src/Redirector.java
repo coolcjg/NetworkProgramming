@@ -26,7 +26,7 @@ public class Redirector {
 	
 	public void start() {
 		try(ServerSocket server = new ServerSocket(port)){
-			logger.info("Redirecting connections on port " + server.getLocalPort() + " to " + new Site);
+			logger.info("Redirecting connections on port " + server.getLocalPort() + " to " + newSite);
 			
 			while(true) {
 				try {
@@ -83,11 +83,17 @@ public class Redirector {
 					out.flush();
 				}
 				
-				
-				
-				
-				
-				
+				out.write("<HTML><HEAD><TITLE>Document moved</TITLE><HEAD>\r\n");
+				out.write("<BODY><H1><TITLE>Document moved</H1>\r\n");
+				out.write("The document " + theFile + " has moved to \r\n"
+						+ "<A HREF=\""+newSite + theFile + "\">" 
+						+ newSite + theFile
+						+ "</A>.\r\n "
+						+ "Please update your bookmarks<P>");
+				out.write("<BODY></HTML>\r\n");
+				out.flush();
+				logger.log(Level.INFO, "Redirected " + connection.getRemoteSocketAddress());
+	
 			}catch(IOException ex) {
 				logger.log(Level.WARNING, "Error talking to " + connection.getRemoteSocketAddress(), ex);
 			}finally {
@@ -96,6 +102,32 @@ public class Redirector {
 				}catch(IOException ex) {}
 			}
 		}
+	
+	}
+	
+	
+	public static void main(String[] args) {
+		int thePort;
+		String theSite;
+		try {
+			theSite = args[0];
+			if(theSite.endsWith("/")) {
+				theSite = theSite.substring(0, theSite.length() -1);
+			}
+		}catch(RuntimeException ex) {
+			System.out.println("Usage : java Redirector http://www.newsite.com/port");
+			return;
+			
+		}
+		try {
+			thePort = Integer.parseInt(args[1]);
+			
+		}catch(RuntimeException ex) {
+			thePort = 80;
+			
+		}
+		Redirector redirector = new Redirector(theSite, thePort);
+		redirector.start();
 	}
 
 }
