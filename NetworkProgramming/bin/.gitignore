@@ -81,3 +81,9 @@
 /p169.class
 /p193.class
 /p34.class
+/SecureOrderTaker.class
+/ChargenClient.class
+/ChargenServer.class
+/IntgenServer.class
+/IntgenClient.class
+/NonblockingSingleFileHTTPServer.class

@@ -9,24 +9,22 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-public class EchoServer {
-	
-	public static int DEFAULT_PORT = 7;
+public class IntgenServer {
+	public static int DEFAULT_PORT = 1919;
 	
 	public static void main(String[] args) {
 		
 		int port;
-		
 		try {
 			port = Integer.parseInt(args[0]);
 		}catch(RuntimeException ex) {
 			port = DEFAULT_PORT;
 		}
+		
 		System.out.println("Listening for connections on port " + port);
 		
 		ServerSocketChannel serverChannel;
-		
-		Selector selector;
+		Selector selector=null;
 		
 		try {
 			serverChannel = ServerSocketChannel.open();
@@ -35,10 +33,9 @@ public class EchoServer {
 			ss.bind(address);
 			serverChannel.configureBlocking(false);
 			selector = Selector.open();
-			serverChannel.register(selector,SelectionKey.OP_ACCEPT);
+			serverChannel.register(selector, SelectionKey.OP_ACCEPT);
 		}catch(IOException ex) {
 			ex.printStackTrace();
-			return;
 		}
 		
 		while(true) {
@@ -46,7 +43,6 @@ public class EchoServer {
 				selector.select();
 			}catch(IOException ex) {
 				ex.printStackTrace();
-				break;
 			}
 			
 			Set<SelectionKey> readyKeys = selector.selectedKeys();
@@ -61,35 +57,35 @@ public class EchoServer {
 						SocketChannel client = server.accept();
 						System.out.println("Accepted connection from " + client);
 						client.configureBlocking(false);
-						SelectionKey clientKey = client.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ);
-						ByteBuffer buffer = ByteBuffer.allocate(100);
-						clientKey.attach(buffer);
-					}
-					if(key.isReadable()) {
-						SocketChannel client = (SocketChannel)key.channel();
-						ByteBuffer output = (ByteBuffer)key.attachment();
-						client.read(output);
-					}
-					if(key.isWritable()) {
-						SocketChannel client = (SocketChannel) key.channel();
-						ByteBuffer output = (ByteBuffer)key.attachment();
+						SelectionKey key2 = client.register(selector,  SelectionKey.OP_WRITE);
+						
+						ByteBuffer output = ByteBuffer.allocate(4);
+						output.putInt(0);
 						output.flip();
+						key2.attach(output);
+					}else if(key.isWritable()) {
+						System.out.println("isWritable()");
+						SocketChannel client = (SocketChannel) key.channel();
+						ByteBuffer output = (ByteBuffer) key.attachment();
+						if(!output.hasRemaining()) {
+							output.rewind();
+							int value = output.getInt();
+							output.clear();
+							output.putInt(value +1);
+							output.flip();
+						}
 						client.write(output);
-						output.compact();
 					}
 				}catch(IOException ex) {
 					key.cancel();
 					try {
 						key.channel().close();
-					}catch(IOException ces) {}
+					}catch(IOException cex) {}
 				}
+				
 			}
 			
 			
-			
 		}
-		
-		
 	}
-
 }
