@@ -28,3 +28,8 @@
 /p34.class
 /DaytimeUDPServer.class
 /DatagramExample.class
+/UDPPortScanner.class
+/UDPDiscardClient.class
+/UDPDiscardServer.class
+/UDPPoke.class
+/UDPTimeClient.class
