@@ -33,3 +33,15 @@
 /UDPDiscardServer.class
 /UDPPoke.class
 /UDPTimeClient.class
+/UDPServer.class
+/FastUDPDiscardServer.class
+/UDPEchoServer.class
+/UDPEchoClient.class
+/SenderThread.class
+/ReceiverThread.class
+/UDPDiscardServerWithChannel.class
+/UDPEchoServerWithChannels.class
+/UDPEchoClientWithChannel.class
+/DefaultSocketOptionValues.class
+/MulticastSniffer.class
+/MulticastSender.class
